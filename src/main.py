@@ -1,33 +1,36 @@
 from threading import Thread
-from Monitor import Monitor
+from Monitor import ProducerConsumer
 
 
-def produce(monitor, item):
-    # while True:
-        monitor.insert(item)
+class Program:
+    def __init__(self, producer_consumer_monitor) -> None:
+        self.producer_consumer_monitor = producer_consumer_monitor
 
+    def produce(self, item):
+        while True:
+            self.producer_consumer_monitor.insert(item)
 
-def consume(monitor):
-    # while True:
-        monitor.remove()
+    def consume(self):
+        while True:
+            self.producer_consumer_monitor.remove()
 
 
 if __name__ == '__main__':
-    monitor = Monitor(5)
+    buffer_size = 5
+    producer_consumer_monitor = ProducerConsumer(buffer_size)
+    program = Program(producer_consumer_monitor)
 
-    # producer_threads = []
-    # consumer_threads = []
     threads = []
     
-    producer_threads_amount = 10
-    consumer_threads_amount = 10
+    producer_threads_amount = 3
+    consumer_threads_amount = 3
 
     for i in range(0, producer_threads_amount):
-        thread = Thread(target=produce, args=(monitor, i))
+        thread = Thread(target=program.produce, args=(i,))
         threads.append(thread)
 
     for i in range(0, consumer_threads_amount):
-        thread = Thread(target=consume, args=(monitor,))
+        thread = Thread(target=program.consume)
         threads.append(thread)
     
     for thread in threads:
